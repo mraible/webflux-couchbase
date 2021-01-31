@@ -1,0 +1,165 @@
+import axios from 'axios';
+import { ICrudGetAction, ICrudGetAllAction, ICrudPutAction, ICrudDeleteAction } from 'react-jhipster';
+
+import { cleanEntity } from 'app/shared/util/entity-utils';
+import { REQUEST, SUCCESS, FAILURE } from 'app/shared/reducers/action-type.util';
+
+import { IPlace, defaultValue } from 'app/shared/model/test-root/place.model';
+
+export const ACTION_TYPES = {
+  FETCH_PLACE_LIST: 'place/FETCH_PLACE_LIST',
+  FETCH_PLACE: 'place/FETCH_PLACE',
+  CREATE_PLACE: 'place/CREATE_PLACE',
+  UPDATE_PLACE: 'place/UPDATE_PLACE',
+  DELETE_PLACE: 'place/DELETE_PLACE',
+  SET_BLOB: 'place/SET_BLOB',
+  RESET: 'place/RESET',
+};
+
+const initialState = {
+  loading: false,
+  errorMessage: null,
+  entities: [] as ReadonlyArray<IPlace>,
+  entity: defaultValue,
+  updating: false,
+  updateSuccess: false,
+};
+
+export type PlaceState = Readonly<typeof initialState>;
+
+// Reducer
+
+export default (state: PlaceState = initialState, action): PlaceState => {
+  switch (action.type) {
+    case REQUEST(ACTION_TYPES.FETCH_PLACE_LIST):
+    case REQUEST(ACTION_TYPES.FETCH_PLACE):
+      return {
+        ...state,
+        errorMessage: null,
+        updateSuccess: false,
+        loading: true,
+      };
+    case REQUEST(ACTION_TYPES.CREATE_PLACE):
+    case REQUEST(ACTION_TYPES.UPDATE_PLACE):
+    case REQUEST(ACTION_TYPES.DELETE_PLACE):
+      return {
+        ...state,
+        errorMessage: null,
+        updateSuccess: false,
+        updating: true,
+      };
+    case FAILURE(ACTION_TYPES.FETCH_PLACE_LIST):
+    case FAILURE(ACTION_TYPES.FETCH_PLACE):
+    case FAILURE(ACTION_TYPES.CREATE_PLACE):
+    case FAILURE(ACTION_TYPES.UPDATE_PLACE):
+    case FAILURE(ACTION_TYPES.DELETE_PLACE):
+      return {
+        ...state,
+        loading: false,
+        updating: false,
+        updateSuccess: false,
+        errorMessage: action.payload,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_PLACE_LIST):
+      return {
+        ...state,
+        loading: false,
+        entities: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_PLACE):
+      return {
+        ...state,
+        loading: false,
+        entity: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.CREATE_PLACE):
+    case SUCCESS(ACTION_TYPES.UPDATE_PLACE):
+      return {
+        ...state,
+        updating: false,
+        updateSuccess: true,
+        entity: action.payload.data,
+      };
+    case SUCCESS(ACTION_TYPES.DELETE_PLACE):
+      return {
+        ...state,
+        updating: false,
+        updateSuccess: true,
+        entity: {},
+      };
+    case ACTION_TYPES.SET_BLOB: {
+      const { name, data, contentType } = action.payload;
+      return {
+        ...state,
+        entity: {
+          ...state.entity,
+          [name]: data,
+          [name + 'ContentType']: contentType,
+        },
+      };
+    }
+    case ACTION_TYPES.RESET:
+      return {
+        ...initialState,
+      };
+    default:
+      return state;
+  }
+};
+
+const apiUrl = 'api/places';
+
+// Actions
+
+export const getEntities: ICrudGetAllAction<IPlace> = (page, size, sort) => ({
+  type: ACTION_TYPES.FETCH_PLACE_LIST,
+  payload: axios.get<IPlace>(`${apiUrl}?cacheBuster=${new Date().getTime()}`),
+});
+
+export const getEntity: ICrudGetAction<IPlace> = id => {
+  const requestUrl = `${apiUrl}/${id}`;
+  return {
+    type: ACTION_TYPES.FETCH_PLACE,
+    payload: axios.get<IPlace>(requestUrl),
+  };
+};
+
+export const createEntity: ICrudPutAction<IPlace> = entity => async dispatch => {
+  const result = await dispatch({
+    type: ACTION_TYPES.CREATE_PLACE,
+    payload: axios.post(apiUrl, cleanEntity(entity)),
+  });
+  dispatch(getEntities());
+  return result;
+};
+
+export const updateEntity: ICrudPutAction<IPlace> = entity => async dispatch => {
+  const result = await dispatch({
+    type: ACTION_TYPES.UPDATE_PLACE,
+    payload: axios.put(apiUrl, cleanEntity(entity)),
+  });
+  return result;
+};
+
+export const deleteEntity: ICrudDeleteAction<IPlace> = id => async dispatch => {
+  const requestUrl = `${apiUrl}/${id}`;
+  const result = await dispatch({
+    type: ACTION_TYPES.DELETE_PLACE,
+    payload: axios.delete(requestUrl),
+  });
+  dispatch(getEntities());
+  return result;
+};
+
+export const setBlob = (name, data, contentType?) => ({
+  type: ACTION_TYPES.SET_BLOB,
+  payload: {
+    name,
+    data,
+    contentType,
+  },
+});
+
+export const reset = () => ({
+  type: ACTION_TYPES.RESET,
+});
