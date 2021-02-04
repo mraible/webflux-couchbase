@@ -14,4 +14,14 @@ import tech.jhipster.sample.domain.EntityWithDTO;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface EntityWithDTORepository extends ReactiveSortingRepository<EntityWithDTO, String> {}
+public interface EntityWithDTORepository extends ReactiveSortingRepository<EntityWithDTO, String> {
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<EntityWithDTO> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<EntityWithDTO> findAll(Sort sort);
+}

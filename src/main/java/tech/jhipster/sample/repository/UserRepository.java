@@ -7,8 +7,8 @@ import java.time.Instant;
 import org.springframework.data.couchbase.repository.Query;
 import org.springframework.data.couchbase.repository.ReactiveCouchbaseRepository;
 import org.springframework.data.couchbase.repository.ScanConsistency;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,7 +46,7 @@ public interface UserRepository extends ReactiveCouchbaseRepository<User, String
 
     @Override
     @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
-    Page<User> findAll(Pageable pageable);
+    Flux<User> findAll(Sort sort);
 
     @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
     Flux<User> findAllByIdNotNull(Pageable pageable);

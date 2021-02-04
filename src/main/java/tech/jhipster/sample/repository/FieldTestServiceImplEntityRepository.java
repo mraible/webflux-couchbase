@@ -14,4 +14,14 @@ import tech.jhipster.sample.domain.FieldTestServiceImplEntity;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface FieldTestServiceImplEntityRepository extends ReactiveSortingRepository<FieldTestServiceImplEntity, String> {}
+public interface FieldTestServiceImplEntityRepository extends ReactiveSortingRepository<FieldTestServiceImplEntity, String> {
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestServiceImplEntity> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestServiceImplEntity> findAll(Sort sort);
+}

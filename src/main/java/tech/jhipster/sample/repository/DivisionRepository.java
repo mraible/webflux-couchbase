@@ -14,4 +14,14 @@ import tech.jhipster.sample.domain.Division;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface DivisionRepository extends ReactiveSortingRepository<Division, String> {}
+public interface DivisionRepository extends ReactiveSortingRepository<Division, String> {
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<Division> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<Division> findAll(Sort sort);
+}

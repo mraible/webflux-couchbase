@@ -15,4 +15,14 @@ import tech.jhipster.sample.domain.FieldTestMapstructAndServiceClassEntity;
 @SuppressWarnings("unused")
 @Repository
 public interface FieldTestMapstructAndServiceClassEntityRepository
-    extends ReactiveSortingRepository<FieldTestMapstructAndServiceClassEntity, String> {}
+    extends ReactiveSortingRepository<FieldTestMapstructAndServiceClassEntity, String> {
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestMapstructAndServiceClassEntity> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestMapstructAndServiceClassEntity> findAll(Sort sort);
+}

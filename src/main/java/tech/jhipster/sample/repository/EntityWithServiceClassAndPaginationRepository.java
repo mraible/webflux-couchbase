@@ -18,4 +18,14 @@ import tech.jhipster.sample.domain.EntityWithServiceClassAndPagination;
 public interface EntityWithServiceClassAndPaginationRepository
     extends ReactiveSortingRepository<EntityWithServiceClassAndPagination, String> {
     Flux<EntityWithServiceClassAndPagination> findAllBy(Pageable pageable);
+
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<EntityWithServiceClassAndPagination> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<EntityWithServiceClassAndPagination> findAll(Sort sort);
 }

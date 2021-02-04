@@ -14,4 +14,14 @@ import tech.jhipster.sample.domain.DocumentBankAccount;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface DocumentBankAccountRepository extends ReactiveSortingRepository<DocumentBankAccount, String> {}
+public interface DocumentBankAccountRepository extends ReactiveSortingRepository<DocumentBankAccount, String> {
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<DocumentBankAccount> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<DocumentBankAccount> findAll(Sort sort);
+}

@@ -17,4 +17,14 @@ import tech.jhipster.sample.domain.FieldTestInfiniteScrollEntity;
 @Repository
 public interface FieldTestInfiniteScrollEntityRepository extends ReactiveSortingRepository<FieldTestInfiniteScrollEntity, String> {
     Flux<FieldTestInfiniteScrollEntity> findAllBy(Pageable pageable);
+
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestInfiniteScrollEntity> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<FieldTestInfiniteScrollEntity> findAll(Sort sort);
 }

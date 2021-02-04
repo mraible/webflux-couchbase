@@ -28,4 +28,14 @@ public interface PlaceRepository extends ReactiveSortingRepository<Place, String
     @Query("#{#n1ql.selectEntity} USE KEYS $1 WHERE #{#n1ql.filter}")
     @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
     Mono<Place> findOneWithEagerRelationships(String id);
+
+    // Add ScanConsistency to fix issue with Spring Data Couchbase
+    // https://github.com/spring-projects/spring-data-couchbase/issues/897
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<Place> findAll();
+
+    @Override
+    @ScanConsistency(query = QueryScanConsistency.REQUEST_PLUS)
+    Flux<Place> findAll(Sort sort);
 }
