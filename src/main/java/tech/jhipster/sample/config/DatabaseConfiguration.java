@@ -34,10 +34,14 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import reactor.core.publisher.Flux;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.sample.config.couchbase.CustomCouchbaseRepositoryFactoryBean;
 
 @Configuration
 @Profile("!" + JHipsterConstants.SPRING_PROFILE_CLOUD)
-@EnableReactiveCouchbaseRepositories(basePackages = "tech.jhipster.sample.repository")
+@EnableReactiveCouchbaseRepositories(
+    basePackages = "tech.jhipster.sample.repository",
+    repositoryFactoryBeanClass = CustomCouchbaseRepositoryFactoryBean.class
+)
 public class DatabaseConfiguration extends AbstractCouchbaseConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);

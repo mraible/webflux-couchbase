@@ -289,7 +289,16 @@ public class UserService {
     }
 
     public Flux<UserDTO> getAllPublicUsers(Pageable pageable) {
-        return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
+        // FIXME: 2/1/21 Current version of Spring Data doesnt seem to support Pagination parameters. Changed the
+        //  method to return a list and added a count query to construct the page.
+        // return userRepository.findAllByIdNotNullAndActivatedIsTrue(pageable).map(UserDTO::new);
+
+        final Long count = userRepository.countAllByIdNotNullAndActivatedIsTrue();
+        if (count == 0) {
+            return Page.empty();
+        }
+        final List<User> users = userRepository.findAllByIdNotNullAndActivatedIsTrue();
+        return new PageImpl<>(users.stream().map(UserDTO::new).collect(Collectors.toList()), pageable, count);
     }
 
     public Mono<Long> countManagedUsers() {
